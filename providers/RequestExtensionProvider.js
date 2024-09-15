@@ -168,9 +168,9 @@ class RequestExtensionProvider extends ServiceProvider {
           ),
           Object.values(cookies).join('|')
         ]
-      ).filter(piece => piece !== '').join('|'))
+      ).filter(piece => Boolean(piece)).join('|'))
 
-      const hash = mhash3.hashBytes(key, key.length, 150)
+      const hash = mhash3.hashString(key, Buffer.byteLength(key, 'utf8'), 150)
 
       return (Number(Math.abs(hash) % 262144263494052048758001).toString(16))
     })

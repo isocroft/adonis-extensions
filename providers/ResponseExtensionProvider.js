@@ -1,7 +1,7 @@
 'use strict'
 
 const zlib = require('zlib')
-const EventEmitter = require('events')
+const { EventEmitter } = require('events')
 const { Readable } = require('stream')
 const nodeReq = require('node-req')
 const onFinished = require('on-finished')
@@ -221,7 +221,13 @@ class ResponseExtensionProvider extends ServiceProvider {
         }
 
         entityBody.stream(that.response, readStream).catch(
-          error => that.abortIf(error !== null, error.code === 'ENOENT' ? 404 : 500, `Something unexpected happened: ${error.message}`)
+          error => that.abortIf(
+            error !== null,
+            error.code === 'ENOENT'
+              ? 404 
+              : 500,
+            `Something unexpected happened: ${error.message}`
+          )
         )
       })
 
@@ -248,10 +254,10 @@ class ResponseExtensionProvider extends ServiceProvider {
             this.__stream.nextChunk = Buffer.concat([
               Buffer.from(`${isFirstMultipartBlock ? '\r\n' : ''}--${this.multiPartBoundary}\r\n`, 'ascii'),
               Buffer.from(`Content-Type: ${contentType}\r\n`, 'ascii'),
-              Buffer.from(`Content-Length: ${payload.length}\r\n\r\n`, 'ascii')
+              Buffer.from(`Content-Length: ${Buffer.byteLength(payload, 'utf8')}\r\n\r\n`, 'ascii')
             ])
           } else {
-            this.__stream.nextChunk = Buffer.from(`${payload.length}\r\n`, 'ascii')
+            this.__stream.nextChunk = Buffer.from(`${Buffer.byteLength(payload, 'utf8')}\r\n`, 'ascii')
           }
         }
 
@@ -309,7 +315,9 @@ class ResponseExtensionProvider extends ServiceProvider {
 
     Response.macro('sendToStream', (body, multiPartContentType = 'text/plain; charset=utf-8') => {
       if (!this.willTransform) {
-        throw new Error('[adonisjs-extensions]: Cannot call `response.sendToStream()` without calling `response.transform()` first')
+        throw new Error(
+          '[adonisjs-extensions]: Cannot call `response.sendToStream()` without calling `response.transform()` first'
+        )
       }
 
       const ContentType = this.adonisRequest.header('Accept', '*/*')

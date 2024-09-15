@@ -1,4 +1,10 @@
 <a name="0.0.11"></a>
+# 0.0.12 (2024-10-25)
+
+### Bug Fixes
+- {Fix} Fixed import error for `const EventListener = require('events')`
+
+<a name="0.0.11"></a>
 # 0.0.11 (2021-12-15)
 
 ### Features Added
